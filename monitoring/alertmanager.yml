@@ -1,0 +1,226 @@
+# ============================================
+# BDFut Alertmanager Configuration
+# ============================================
+"""
+Configuração do Alertmanager para gerenciamento de alertas do BDFut.
+Define roteamento, agrupamento e notificações de alertas.
+"""
+
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@bdfut.com'
+  smtp_auth_username: 'alerts@bdfut.com'
+  smtp_auth_password: 'password'
+
+# Configuração de templates
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Configuração de roteamento
+route:
+  group_by: ['alertname', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'default-receiver'
+  routes:
+    # Alertas críticos
+    - match:
+        severity: critical
+      receiver: 'critical-receiver'
+      group_wait: 5s
+      repeat_interval: 30m
+    
+    # Alertas de sistema
+    - match:
+        service: bdfut
+      receiver: 'system-receiver'
+      group_wait: 10s
+      repeat_interval: 2h
+    
+    # Alertas de API
+    - match:
+        service: bdfut-api
+      receiver: 'api-receiver'
+      group_wait: 5s
+      repeat_interval: 1h
+    
+    # Alertas de banco de dados
+    - match:
+        service: bdfut-database
+      receiver: 'database-receiver'
+      group_wait: 10s
+      repeat_interval: 2h
+    
+    # Alertas de cache
+    - match:
+        service: bdfut-cache
+      receiver: 'cache-receiver'
+      group_wait: 10s
+      repeat_interval: 2h
+    
+    # Alertas de ETL
+    - match:
+        service: bdfut-etl
+      receiver: 'etl-receiver'
+      group_wait: 5s
+      repeat_interval: 1h
+    
+    # Alertas de segurança
+    - match:
+        service: bdfut-security
+      receiver: 'security-receiver'
+      group_wait: 5s
+      repeat_interval: 30m
+
+# Configuração de inibição
+inhibit_rules:
+  # Inibir alertas de sistema quando serviço está down
+  - source_match:
+      alertname: 'ServiceDown'
+    target_match:
+      severity: warning
+    equal: ['service']
+  
+  # Inibir alertas de API quando serviço está down
+  - source_match:
+      alertname: 'ServiceDown'
+    target_match:
+      service: bdfut-api
+    equal: ['instance']
+
+# Configuração de receivers
+receivers:
+  # Receiver padrão
+  - name: 'default-receiver'
+    webhook_configs:
+      - url: 'http://webhook:5001/alerts'
+        send_resolved: true
+        http_config:
+          basic_auth:
+            username: 'webhook'
+            password: 'password'
+  
+  # Receiver para alertas críticos
+  - name: 'critical-receiver'
+    email_configs:
+      - to: 'admin@bdfut.com'
+        subject: '[CRITICAL] BDFut Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          Instance: {{ .Labels.instance }}
+          {{ end }}
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:5001/critical'
+        send_resolved: true
+  
+  # Receiver para alertas de sistema
+  - name: 'system-receiver'
+    email_configs:
+      - to: 'ops@bdfut.com'
+        subject: '[SYSTEM] BDFut Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:5001/system'
+        send_resolved: true
+  
+  # Receiver para alertas de API
+  - name: 'api-receiver'
+    email_configs:
+      - to: 'api-team@bdfut.com'
+        subject: '[API] BDFut Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:5001/api'
+        send_resolved: true
+  
+  # Receiver para alertas de banco de dados
+  - name: 'database-receiver'
+    email_configs:
+      - to: 'dba@bdfut.com'
+        subject: '[DATABASE] BDFut Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:5001/database'
+        send_resolved: true
+  
+  # Receiver para alertas de cache
+  - name: 'cache-receiver'
+    email_configs:
+      - to: 'cache-team@bdfut.com'
+        subject: '[CACHE] BDFut Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:5001/cache'
+        send_resolved: true
+  
+  # Receiver para alertas de ETL
+  - name: 'etl-receiver'
+    email_configs:
+      - to: 'etl-team@bdfut.com'
+        subject: '[ETL] BDFut Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:5001/etl'
+        send_resolved: true
+  
+  # Receiver para alertas de segurança
+  - name: 'security-receiver'
+    email_configs:
+      - to: 'security@bdfut.com'
+        subject: '[SECURITY] BDFut Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:5001/security'
+        send_resolved: true
+    pagerduty_configs:
+      - service_key: 'your-pagerduty-service-key'
+        description: 'BDFut Security Alert'
+        severity: 'critical'

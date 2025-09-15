@@ -1,0 +1,20 @@
+# ============================================
+# BDFut Grafana Dashboard Provisioning
+# ============================================
+"""
+Configuração de provisioning de dashboards para Grafana.
+Define dashboards automáticos para monitoramento do BDFut.
+"""
+
+apiVersion: 1
+
+providers:
+  - name: 'BDFut Dashboards'
+    orgId: 1
+    folder: 'BDFut'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

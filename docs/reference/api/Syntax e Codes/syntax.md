@@ -1,0 +1,6 @@
+# Syntax
+
+This syntax can be used across all endpoints: the documentation for each endpoint describes the exceptions regarding exclusions of some fields/relations
+
+<table><thead><tr><th>Syntax</th><th width="211">Usage</th><th width="272">Example</th></tr></thead><tbody><tr><td><code>&#x26;select=</code></td><td>Select specific fields on the base entity</td><td><code>&#x26;select=name</code></td></tr><tr><td><code>&#x26;include=</code></td><td>Include relations</td><td><code>&#x26;include=lineups</code></td></tr><tr><td><code>&#x26;filters=</code></td><td>Filter your request</td><td><code>&#x26;filters=eventTypes:15</code></td></tr><tr><td><code>;</code></td><td>Mark end of (nested) relation. You can start including other relations from here</td><td><code>&#x26;include=lineups;events;participants</code></td></tr><tr><td><code>:</code></td><td>Mark field selection</td><td><code>&#x26;include=lineups:player_name;events:player_name,related_player_name,minute</code></td></tr><tr><td><code>,</code></td><td>Used as separation to select or filter on more IDs</td><td><code>&#x26;include=events:player_name,related_player_name,minute&#x26;filters=eventTypes:15</code></td></tr></tbody></table>
+

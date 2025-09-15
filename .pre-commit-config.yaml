@@ -1,0 +1,193 @@
+# Pre-commit hooks configuration for BDFut
+# ==========================================
+# This file defines all pre-commit hooks for code quality, security, and consistency
+
+repos:
+  # =====================================
+  # BASIC FILE QUALITY HOOKS
+  # =====================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # File formatting
+      - id: trailing-whitespace
+        description: Trim trailing whitespace
+      - id: end-of-file-fixer
+        description: Ensure files end with newline
+      - id: mixed-line-ending
+        description: Replace mixed line endings
+        args: [--fix=lf]
+      
+      # YAML/JSON validation
+      - id: check-yaml
+        description: Check YAML syntax
+        args: [--multi]
+      - id: check-json
+        description: Check JSON syntax
+      - id: pretty-format-json
+        description: Format JSON files
+        args: [--autofix]
+      - id: check-toml
+        description: Check TOML syntax
+      
+      # Security and safety
+      - id: check-added-large-files
+        description: Prevent large files from being committed
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+        description: Check for merge conflict markers
+      - id: debug-statements
+        description: Check for debugger imports and breakpoints
+      - id: detect-private-key
+        description: Detect private keys
+      
+      # Python specific
+      - id: check-ast
+        description: Check Python AST syntax
+      - id: check-builtin-literals
+        description: Check for builtin literals usage
+      - id: check-docstring-first
+        description: Check docstring comes first
+      - id: name-tests-test
+        description: Ensure test files are named correctly
+        args: [--pytest-test-first]
+
+  # =====================================
+  # PYTHON CODE FORMATTING
+  # =====================================
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        description: Format Python code with Black
+        language_version: python3
+        args: [--line-length=88]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        description: Sort Python imports
+        args: [--profile=black, --line-length=88]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.0
+    hooks:
+      - id: pyupgrade
+        description: Upgrade Python syntax
+        args: [--py38-plus]
+
+  # =====================================
+  # PYTHON CODE QUALITY
+  # =====================================
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        description: Lint Python code with Flake8
+        args: 
+          - --max-line-length=88
+          - --extend-ignore=E203,W503
+          - --max-complexity=10
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        description: Type checking with MyPy
+        additional_dependencies: 
+          - types-requests
+          - types-click
+          - types-python-dateutil
+        args: [--ignore-missing-imports, --strict-optional]
+
+  # =====================================
+  # SECURITY HOOKS
+  # =====================================
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        description: Security linting with Bandit
+        args: [-r, --skip=B101,B601]
+        exclude: ^tests/
+
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.25.0
+    hooks:
+      - id: ggshield
+        description: GitGuardian secrets detection
+        language: python
+        stages: [commit]
+
+  # =====================================
+  # DOCKER HOOKS
+  # =====================================
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        description: Lint Dockerfiles
+        args: [--ignore, DL3008, --ignore, DL3009]
+
+  # =====================================
+  # DOCUMENTATION HOOKS
+  # =====================================
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+        description: Check for blanket noqa
+      - id: python-check-blanket-type-ignore
+        description: Check for blanket type ignores
+      - id: python-no-log-warn
+        description: Check for deprecated log.warn
+      - id: python-use-type-annotations
+        description: Enforce type annotations over comments
+      - id: rst-backticks
+        description: Check RST backticks
+      - id: rst-directive-colons
+        description: Check RST directive colons
+      - id: rst-inline-touching-normal
+        description: Check RST inline touching normal
+
+  # =====================================
+  # COMMIT MESSAGE HOOKS
+  # =====================================
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
+    hooks:
+      - id: commitizen
+        description: Check commit message format
+        stages: [commit-msg]
+
+  # =====================================
+  # PERFORMANCE AND COMPLEXITY
+  # =====================================
+  - repo: local
+    hooks:
+      - id: pytest-check
+        name: pytest-check
+        description: Run pytest to ensure tests pass
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        args: [tests/, --tb=short]
+        
+      - id: coverage-check
+        name: coverage-check
+        description: Check test coverage
+        entry: bash
+        language: system
+        pass_filenames: false
+        always_run: true
+        args: 
+          - -c
+          - |
+            pytest --cov=bdfut --cov-report=term-missing --cov-fail-under=60 tests/

@@ -1,0 +1,138 @@
+# ============================================
+# BDFut - Agendamento de Sincronizações ETL
+# ============================================
+# 
+# Este arquivo define os agendamentos para sincronizações automáticas
+# do sistema BDFut usando cron.
+#
+# Para instalar: crontab bdfut_sync_schedule.cron
+# Para verificar: crontab -l
+# Para remover: crontab -r
+#
+# IMPORTANTE: Ajuste os paths absolutos conforme seu ambiente
+
+# ============================================
+# VARIÁVEIS DE AMBIENTE
+# ============================================
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+MAILTO=admin@bdfut.com
+HOME=/Users/mhbutzke/Documents/BDFut/bdfut
+
+# ============================================
+# SINCRONIZAÇÕES CRÍTICAS (ALTA FREQUÊNCIA)
+# ============================================
+
+# Fixtures de hoje/amanhã - A cada 15 minutos durante horários de jogos
+*/15 8-23 * * * cd $HOME && python3 bdfut/scripts/etl_organized/04_fixtures_events/04_fixtures_events_06_daily_sync.py --mode smart >> bdfut/logs/sync_critical.log 2>&1
+
+# ============================================
+# SINCRONIZAÇÕES REGULARES (FREQUÊNCIA MÉDIA)
+# ============================================
+
+# Sincronização completa diária - Todo dia às 06:00
+0 6 * * * cd $HOME && python3 bdfut/scripts/etl_organized/04_fixtures_events/04_fixtures_events_06_daily_sync.py --mode once >> bdfut/logs/sync_daily.log 2>&1
+
+# Fixtures recentes - A cada 2 horas durante o dia
+0 */2 * * * cd $HOME && python3 -c "
+from bdfut.core.incremental_sync import IncrementalSyncManager
+sync = IncrementalSyncManager()
+sync.sync_recent_fixtures()
+" >> bdfut/logs/sync_hourly.log 2>&1
+
+# ============================================
+# SINCRONIZAÇÕES DE MANUTENÇÃO (BAIXA FREQUÊNCIA)
+# ============================================
+
+# Dados base - Toda segunda às 02:00
+0 2 * * 1 cd $HOME && python3 -c "
+from bdfut.core.incremental_sync import IncrementalSyncManager
+sync = IncrementalSyncManager()
+sync.sync_base_data_incremental()
+" >> bdfut/logs/sync_weekly.log 2>&1
+
+# Classificações - Todo dia às 23:00
+0 23 * * * cd $HOME && python3 -c "
+from bdfut.core.incremental_sync import IncrementalSyncManager
+sync = IncrementalSyncManager()
+sync.sync_team_standings()
+" >> bdfut/logs/sync_standings.log 2>&1
+
+# ============================================
+# LIMPEZA E MANUTENÇÃO
+# ============================================
+
+# Limpeza de logs antigos - Todo domingo às 01:00
+0 1 * * 0 find $HOME/bdfut/logs -name "*.log" -mtime +30 -delete
+
+# Limpeza de cache expirado - Todo dia às 03:00
+0 3 * * * cd $HOME && python3 -c "
+from bdfut.core.redis_cache import RedisCache
+cache = RedisCache()
+if cache.redis_available:
+    cache.redis_client.eval('return redis.call(\"DEL\", unpack(redis.call(\"KEYS\", \"bdfut:*:expired:*\")))', 0)
+" >> bdfut/logs/cache_cleanup.log 2>&1
+
+# Estatísticas diárias - Todo dia às 07:00
+0 7 * * * cd $HOME && python3 -c "
+from bdfut.core.incremental_sync import IncrementalSyncManager
+sync = IncrementalSyncManager()
+status = sync.get_sync_status()
+print('📊 Status diário:', status)
+" >> bdfut/logs/daily_status.log 2>&1
+
+# ============================================
+# MONITORAMENTO E ALERTAS
+# ============================================
+
+# Verificação de saúde - A cada 30 minutos
+*/30 * * * * cd $HOME && python3 -c "
+from bdfut.core.redis_cache import RedisCache
+from bdfut.core.etl_metadata import ETLMetadataManager
+
+# Verificar Redis
+cache = RedisCache()
+health = cache.health_check()
+
+# Verificar jobs falhando
+metadata = ETLMetadataManager()
+recent_jobs = metadata.get_recent_jobs(limit=10)
+failed_jobs = [j for j in recent_jobs if j.get('status') == 'failed']
+
+if not health['overall_healthy'] or len(failed_jobs) > 3:
+    print(f'🚨 ALERTA: Sistema com problemas - Redis: {health[\"redis_healthy\"]}, Jobs falhando: {len(failed_jobs)}')
+" >> bdfut/logs/health_check.log 2>&1
+
+# ============================================
+# COMENTÁRIOS E DOCUMENTAÇÃO
+# ============================================
+#
+# FREQUÊNCIAS EXPLICADAS:
+# */15 8-23 * * *  = A cada 15 min das 8h às 23h, todos os dias
+# 0 6 * * *        = Todo dia às 06:00
+# 0 */2 * * *      = A cada 2 horas
+# 0 2 * * 1        = Segunda-feira às 02:00
+# 0 23 * * *       = Todo dia às 23:00
+# 0 1 * * 0        = Domingo às 01:00
+# */30 * * * *     = A cada 30 minutos
+#
+# LOGS:
+# - sync_critical.log  = Sincronizações críticas (15 min)
+# - sync_daily.log     = Sincronização diária completa
+# - sync_hourly.log    = Sincronizações horárias
+# - sync_weekly.log    = Sincronizações semanais
+# - sync_standings.log = Sincronizações de classificações
+# - cache_cleanup.log  = Limpeza de cache
+# - daily_status.log   = Status diário
+# - health_check.log   = Verificações de saúde
+#
+# INSTALAÇÃO:
+# 1. Ajustar variável HOME para seu path
+# 2. Verificar paths dos scripts Python
+# 3. Instalar: crontab bdfut_sync_schedule.cron
+# 4. Verificar: crontab -l
+#
+# MONITORAMENTO:
+# - Logs em bdfut/logs/
+# - Verificar health_check.log para alertas
+# - Monitorar daily_status.log para estatísticas

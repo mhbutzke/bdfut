@@ -1,0 +1,107 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bdfut"
+version = "2.0.0"
+description = "Sistema ETL para dados de futebol da Sportmonks API"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "BDFut Team", email = "team@bdfut.com"},
+]
+keywords = ["football", "soccer", "etl", "sportmonks", "supabase", "data"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Database",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+
+dependencies = [
+    "supabase>=2.10.0",
+    "requests>=2.32.3",
+    "python-dotenv>=1.0.1",
+    "pandas>=2.2.3",
+    "psycopg2-binary>=2.9.9",
+    "tenacity>=9.0.0",
+    "pydantic>=2.9.2",
+    "click>=8.1.7",
+    "tqdm>=4.67.1",
+    "schedule>=1.2.2",
+    "colorama>=0.4.6",
+    "redis>=5.0.0",
+    "hiredis>=2.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+
+[project.scripts]
+bdfut = "bdfut.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/bdfut/bdfut"
+Documentation = "https://bdfut.readthedocs.io"
+Repository = "https://github.com/bdfut/bdfut.git"
+Issues = "https://github.com/bdfut/bdfut/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bdfut*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=bdfut --cov-report=html --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true

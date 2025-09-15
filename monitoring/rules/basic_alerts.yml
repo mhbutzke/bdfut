@@ -1,0 +1,262 @@
+# ============================================
+# BDFut Basic Alerting Rules
+# ============================================
+"""
+Regras de alerta básicas para o sistema BDFut.
+Define condições críticas que devem gerar alertas.
+"""
+
+groups:
+  - name: bdfut.rules
+    rules:
+      # ============================================
+      # ALERTAS DE SISTEMA
+      # ============================================
+      
+      # CPU Usage High
+      - alert: HighCPUUsage
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 5 minutes"
+
+      # Memory Usage High
+      - alert: HighMemoryUsage
+        expr: 100 - ((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 5 minutes"
+
+      # Disk Usage High
+      - alert: HighDiskUsage
+        expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100) > 90
+        for: 5m
+        labels:
+          severity: critical
+          service: bdfut
+        annotations:
+          summary: "High disk usage detected"
+          description: "Disk usage is above 90% for more than 5 minutes"
+
+      # Load Average High
+      - alert: HighLoadAverage
+        expr: node_load1 > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut
+        annotations:
+          summary: "High load average detected"
+          description: "Load average is above 5 for more than 5 minutes"
+
+      # ============================================
+      # ALERTAS DE APLICAÇÃO
+      # ============================================
+
+      # API Response Time High
+      - alert: HighAPIResponseTime
+        expr: histogram_quantile(0.95, rate(bdfut_api_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut-api
+        annotations:
+          summary: "High API response time"
+          description: "95th percentile response time is above 2 seconds"
+
+      # API Error Rate High
+      - alert: HighAPIErrorRate
+        expr: rate(bdfut_api_requests_total{status_code=~"5.."}[5m]) / rate(bdfut_api_requests_total[5m]) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+          service: bdfut-api
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate is above 5% for more than 2 minutes"
+
+      # API Request Rate Low
+      - alert: LowAPIRequestRate
+        expr: rate(bdfut_api_requests_total[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: warning
+          service: bdfut-api
+        annotations:
+          summary: "Low API request rate"
+          description: "API request rate is below 0.1 req/s for more than 10 minutes"
+
+      # ============================================
+      # ALERTAS DE BANCO DE DADOS
+      # ============================================
+
+      # Database Connection High
+      - alert: HighDatabaseConnections
+        expr: pg_stat_database_numbackends > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut-database
+        annotations:
+          summary: "High database connections"
+          description: "Database connections are above 80 for more than 5 minutes"
+
+      # Database Query Time High
+      - alert: HighDatabaseQueryTime
+        expr: histogram_quantile(0.95, rate(pg_stat_database_tup_returned[5m])) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut-database
+        annotations:
+          summary: "High database query time"
+          description: "Database query time is above 1000ms for more than 5 minutes"
+
+      # ============================================
+      # ALERTAS DE CACHE
+      # ============================================
+
+      # Redis Memory Usage High
+      - alert: HighRedisMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut-cache
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis memory usage is above 80% for more than 5 minutes"
+
+      # Redis Connection High
+      - alert: HighRedisConnections
+        expr: redis_connected_clients > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut-cache
+        annotations:
+          summary: "High Redis connections"
+          description: "Redis connections are above 100 for more than 5 minutes"
+
+      # ============================================
+      # ALERTAS DE ETL
+      # ============================================
+
+      # ETL Job Failed
+      - alert: ETLJobFailed
+        expr: bdfut_etl_jobs_total{status="failed"} > 0
+        for: 0m
+        labels:
+          severity: critical
+          service: bdfut-etl
+        annotations:
+          summary: "ETL job failed"
+          description: "ETL job has failed"
+
+      # ETL Job Duration High
+      - alert: ETLJobDurationHigh
+        expr: bdfut_etl_job_duration_seconds > 3600
+        for: 0m
+        labels:
+          severity: warning
+          service: bdfut-etl
+        annotations:
+          summary: "ETL job duration high"
+          description: "ETL job duration is above 1 hour"
+
+      # ============================================
+      # ALERTAS DE SERVIÇOS
+      # ============================================
+
+      # Service Down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: bdfut
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.job }} is down"
+
+      # Prometheus Down
+      - alert: PrometheusDown
+        expr: up{job="prometheus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: prometheus
+        annotations:
+          summary: "Prometheus is down"
+          description: "Prometheus monitoring service is down"
+
+      # Grafana Down
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 1m
+        labels:
+          severity: warning
+          service: grafana
+        annotations:
+          summary: "Grafana is down"
+          description: "Grafana dashboard service is down"
+
+      # ============================================
+      # ALERTAS DE SEGURANÇA
+      # ============================================
+
+      # High Failed Login Attempts
+      - alert: HighFailedLoginAttempts
+        expr: rate(bdfut_auth_failed_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: bdfut-security
+        annotations:
+          summary: "High failed login attempts"
+          description: "Failed login attempts rate is above 10/min for more than 2 minutes"
+
+      # Suspicious Activity
+      - alert: SuspiciousActivity
+        expr: rate(bdfut_security_events_total{severity="high"}[5m]) > 5
+        for: 1m
+        labels:
+          severity: critical
+          service: bdfut-security
+        annotations:
+          summary: "Suspicious activity detected"
+          description: "High severity security events detected"
+
+      # ============================================
+      # ALERTAS DE PERFORMANCE
+      # ============================================
+
+      # GC Pressure High
+      - alert: HighGCPressure
+        expr: rate(bdfut_gc_collections_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut-performance
+        annotations:
+          summary: "High GC pressure"
+          description: "Garbage collection pressure is high"
+
+      # Thread Count High
+      - alert: HighThreadCount
+        expr: bdfut_thread_count > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: bdfut-performance
+        annotations:
+          summary: "High thread count"
+          description: "Thread count is above 100 for more than 5 minutes"

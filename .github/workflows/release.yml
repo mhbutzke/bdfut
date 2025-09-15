@@ -1,0 +1,300 @@
+name: Release Automation
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # =====================================
+  # JOB 1: VALIDATE RELEASE
+  # =====================================
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is-prerelease: ${{ steps.version.outputs.is-prerelease }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Determine version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+          IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
+        else
+          VERSION="${{ github.ref_name }}"
+          # Determinar se é pre-release baseado no nome da tag
+          if [[ "$VERSION" =~ -[a-zA-Z] ]]; then
+            IS_PRERELEASE="true"
+          else
+            IS_PRERELEASE="false"
+          fi
+        fi
+        
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "is-prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+        
+        echo "## 🏷️ Release Information" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+        echo "- **Pre-release:** $IS_PRERELEASE" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Validate version format
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+          echo "❌ Invalid version format: $VERSION"
+          echo "Expected format: vX.Y.Z or vX.Y.Z-suffix"
+          exit 1
+        fi
+        echo "✅ Version format is valid"
+    
+    - name: Check if tag exists
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        if git rev-parse "$VERSION" >/dev/null 2>&1; then
+          echo "✅ Tag $VERSION exists"
+        else
+          echo "❌ Tag $VERSION does not exist"
+          exit 1
+        fi
+
+  # =====================================
+  # JOB 2: BUILD RELEASE ARTIFACTS
+  # =====================================
+  build:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: |
+        echo "🔨 Building Python package..."
+        python -m build
+        
+        echo "## 📦 Build Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "### Wheel:" >> $GITHUB_STEP_SUMMARY
+        ls -la dist/*.whl >> $GITHUB_STEP_SUMMARY
+        echo "### Source Distribution:" >> $GITHUB_STEP_SUMMARY
+        ls -la dist/*.tar.gz >> $GITHUB_STEP_SUMMARY
+    
+    - name: Verify package
+      run: |
+        echo "🔍 Verifying package integrity..."
+        twine check dist/*
+        
+        # Instalar e testar o pacote construído
+        pip install dist/*.whl
+        python -c "import bdfut; print(f'✅ Package imported successfully: {bdfut.__version__ if hasattr(bdfut, \"__version__\") else \"version not found\"}')"
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package
+        path: dist/
+
+  # =====================================
+  # JOB 3: GENERATE CHANGELOG
+  # =====================================
+  changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Generate changelog
+      id: changelog
+      run: |
+        VERSION="${{ needs.validate.outputs.version }}"
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+        
+        echo "## 📝 Changelog for $VERSION" > changelog.md
+        echo "" >> changelog.md
+        
+        if [ -n "$PREVIOUS_TAG" ]; then
+          echo "### Changes since $PREVIOUS_TAG:" >> changelog.md
+          echo "" >> changelog.md
+          
+          # Commits por categoria
+          echo "#### 🚀 Features:" >> changelog.md
+          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG..HEAD" --grep="feat:" --grep="feature:" >> changelog.md || true
+          echo "" >> changelog.md
+          
+          echo "#### 🐛 Bug Fixes:" >> changelog.md
+          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG..HEAD" --grep="fix:" --grep="bugfix:" >> changelog.md || true
+          echo "" >> changelog.md
+          
+          echo "#### 📚 Documentation:" >> changelog.md
+          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG..HEAD" --grep="docs:" >> changelog.md || true
+          echo "" >> changelog.md
+          
+          echo "#### 🔧 Maintenance:" >> changelog.md
+          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG..HEAD" --grep="chore:" --grep="refactor:" >> changelog.md || true
+          echo "" >> changelog.md
+          
+          echo "#### All Changes:" >> changelog.md
+          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG..HEAD" --oneline >> changelog.md
+        else
+          echo "### Initial Release" >> changelog.md
+          echo "This is the first release of BDFut." >> changelog.md
+        fi
+        
+        # Ler changelog para output
+        CHANGELOG=$(cat changelog.md)
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+        # Adicionar ao summary
+        cat changelog.md >> $GITHUB_STEP_SUMMARY
+    
+    - name: Upload changelog
+      uses: actions/upload-artifact@v3
+      with:
+        name: changelog
+        path: changelog.md
+
+  # =====================================
+  # JOB 4: CREATE GITHUB RELEASE
+  # =====================================
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate, build, changelog]
+    
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+    
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.validate.outputs.version }}
+        release_name: Release ${{ needs.validate.outputs.version }}
+        body: ${{ needs.changelog.outputs.changelog }}
+        draft: false
+        prerelease: ${{ needs.validate.outputs.is-prerelease == 'true' }}
+    
+    - name: Upload wheel to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/python-package/bdfut-*.whl
+        asset_name: bdfut-${{ needs.validate.outputs.version }}-py3-none-any.whl
+        asset_content_type: application/zip
+    
+    - name: Upload source distribution to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/python-package/bdfut-*.tar.gz
+        asset_name: bdfut-${{ needs.validate.outputs.version }}.tar.gz
+        asset_content_type: application/gzip
+
+  # =====================================
+  # JOB 5: PUBLISH TO PYPI (OPCIONAL)
+  # =====================================
+  publish-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: [validate, build, release]
+    if: needs.validate.outputs.is-prerelease == 'false'
+    
+    environment:
+      name: pypi
+      url: https://pypi.org/project/bdfut/
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package
+        path: dist
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        skip_existing: true
+
+  # =====================================
+  # JOB 6: POST-RELEASE NOTIFICATIONS
+  # =====================================
+  notify:
+    name: Post-Release Notifications
+    runs-on: ubuntu-latest
+    needs: [validate, release]
+    if: always() && needs.release.result == 'success'
+    
+    steps:
+    - name: Create release summary
+      run: |
+        echo "## 🎉 Release ${{ needs.validate.outputs.version }} Published!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📋 Release Details:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version:** ${{ needs.validate.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Pre-release:** ${{ needs.validate.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **GitHub Release:** [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ needs.validate.outputs.version }})" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🚀 Next Steps:" >> $GITHUB_STEP_SUMMARY
+        echo "- [ ] Verify release artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "- [ ] Update documentation" >> $GITHUB_STEP_SUMMARY
+        echo "- [ ] Announce release" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,28 @@
+================================================================================
+📊 RELATÓRIO FINAL DO BACKFILL HISTÓRICO
+================================================================================
+
+🕒 Executado em: 2025-09-15 13:55:15
+⏱️ Duração: 0s (0min)
+✅ Status: SUCESSO
+
+📈 ESTATÍSTICAS GERAIS:
+  • Ligas processadas: 0/5
+  • Temporadas processadas: 0
+  • Fixtures coletadas: 0
+  • Requisições à API: 0
+  • Erros encontrados: 0
+
+🏆 DETALHES POR LIGA:
+
+🔍 VALIDAÇÃO DE DADOS:
+  • Ligas representadas: 5
+  • Temporadas representadas: 0
+  • Score de qualidade: 0.0%
+
+💡 RECOMENDAÇÕES:
+  • Meta de 10.000 fixtures: ❌ NÃO ATINGIDA
+  • Taxa de erro: 0.0%
+  • Performance: 0.0 fixtures/segundo
+
+================================================================================

@@ -1,0 +1,11 @@
+supabase==2.10.0
+requests==2.32.3
+python-dotenv==1.0.1
+pandas==2.2.3
+psycopg2-binary==2.9.9
+tenacity==9.0.0
+pydantic==2.9.2
+click==8.1.7
+tqdm==4.67.1
+schedule==1.2.2
+colorama==0.4.6

@@ -1,0 +1,352 @@
+name: Docker & Infrastructure
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - 'requirements.txt'
+      - 'pyproject.toml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - 'requirements.txt'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # =====================================
+  # JOB 1: DOCKERFILE LINTING
+  # =====================================
+  dockerfile-lint:
+    name: Dockerfile Linting
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Hadolint
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
+        format: sarif
+        output-file: hadolint-results.sarif
+        no-fail: true
+    
+    - name: Upload Hadolint results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: hadolint-results.sarif
+    
+    - name: Run Hadolint (human readable)
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
+        format: tty
+    
+    - name: Validate docker-compose.yml
+      run: |
+        echo "🔍 Validating docker-compose.yml..."
+        docker-compose config -q
+        echo "✅ docker-compose.yml is valid"
+
+  # =====================================
+  # JOB 2: DOCKER BUILD TEST
+  # =====================================
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: dockerfile-lint
+    
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build Docker image for ${{ matrix.platform }}
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: ${{ matrix.platform }}
+        push: false
+        tags: bdfut:test-${{ matrix.platform }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker,dest=/tmp/bdfut-${{ matrix.platform }}.tar
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-image-${{ matrix.platform }}
+        path: /tmp/bdfut-${{ matrix.platform }}.tar
+
+  # =====================================
+  # JOB 3: CONTAINER SECURITY SCAN
+  # =====================================
+  container-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    needs: docker-build
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download Docker image
+      uses: actions/download-artifact@v3
+      with:
+        name: docker-image-linux/amd64
+        path: /tmp
+    
+    - name: Load Docker image
+      run: |
+        docker load --input /tmp/bdfut-linux/amd64.tar
+        docker tag bdfut:test-linux/amd64 bdfut:latest
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'bdfut:latest'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+    
+    - name: Run Trivy (human readable)
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'bdfut:latest'
+        format: 'table'
+        severity: 'HIGH,CRITICAL'
+
+  # =====================================
+  # JOB 4: CONTAINER FUNCTIONALITY TEST
+  # =====================================
+  container-test:
+    name: Container Functionality Test
+    runs-on: ubuntu-latest
+    needs: docker-build
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download Docker image
+      uses: actions/download-artifact@v3
+      with:
+        name: docker-image-linux/amd64
+        path: /tmp
+    
+    - name: Load and test Docker image
+      run: |
+        docker load --input /tmp/bdfut-linux/amd64.tar
+        docker tag bdfut:test-linux/amd64 bdfut:latest
+        
+        echo "🧪 Testing container functionality..."
+        
+        # Testar se o container inicia corretamente
+        docker run --rm bdfut:latest python --version
+        
+        # Testar se o módulo bdfut pode ser importado
+        docker run --rm bdfut:latest python -c "import bdfut; print('✅ BDFut module imported successfully')"
+        
+        # Testar CLI básico (sem argumentos)
+        docker run --rm bdfut:latest python -m bdfut.cli --help || true
+        
+        echo "✅ Container functionality tests passed"
+
+  # =====================================
+  # JOB 5: DOCKER COMPOSE TEST
+  # =====================================
+  compose-test:
+    name: Docker Compose Test
+    runs-on: ubuntu-latest
+    needs: dockerfile-lint
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create test environment file
+      run: |
+        cat > .env.test << EOF
+        # Test environment variables
+        SUPABASE_URL=https://test.supabase.co
+        SUPABASE_KEY=test_key
+        SPORTMONKS_API_KEY=test_key
+        ENVIRONMENT=test
+        EOF
+    
+    - name: Test docker-compose build
+      run: |
+        echo "🏗️ Testing docker-compose build..."
+        cp .env.test .env
+        docker-compose build --no-cache
+        echo "✅ docker-compose build successful"
+    
+    - name: Test docker-compose up (dry run)
+      run: |
+        echo "🚀 Testing docker-compose services..."
+        docker-compose config --services
+        
+        # Validar que todos os serviços estão definidos
+        if docker-compose config --services | grep -q "bdfut"; then
+          echo "✅ BDFut service found"
+        else
+          echo "❌ BDFut service not found"
+          exit 1
+        fi
+    
+    - name: Clean up
+      if: always()
+      run: |
+        docker-compose down --volumes --remove-orphans || true
+        rm -f .env .env.test
+
+  # =====================================
+  # JOB 6: INFRASTRUCTURE VALIDATION
+  # =====================================
+  infrastructure-check:
+    name: Infrastructure Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Validate Makefile
+      run: |
+        echo "🔍 Validating Makefile..."
+        make help
+        echo "✅ Makefile is valid"
+    
+    - name: Check for required files
+      run: |
+        echo "📋 Checking for required infrastructure files..."
+        
+        REQUIRED_FILES=(
+          "Dockerfile"
+          "docker-compose.yml"
+          "requirements.txt"
+          "pyproject.toml"
+          "Makefile"
+          ".gitignore"
+          ".pre-commit-config.yaml"
+        )
+        
+        for file in "${REQUIRED_FILES[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✅ $file exists"
+          else
+            echo "❌ $file is missing"
+            exit 1
+          fi
+        done
+    
+    - name: Validate project structure
+      run: |
+        echo "🏗️ Validating project structure..."
+        
+        REQUIRED_DIRS=(
+          "bdfut"
+          "tests"
+          "docs"
+          ".github/workflows"
+        )
+        
+        for dir in "${REQUIRED_DIRS[@]}"; do
+          if [ -d "$dir" ]; then
+            echo "✅ $dir/ exists"
+          else
+            echo "❌ $dir/ is missing"
+            exit 1
+          fi
+        done
+    
+    - name: Generate infrastructure report
+      run: |
+        echo "## 🏗️ Infrastructure Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### 📊 Project Statistics:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Python files:** $(find . -name '*.py' | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Test files:** $(find tests -name '*.py' 2>/dev/null | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow files:** $(find .github/workflows -name '*.yml' | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Documentation files:** $(find docs -name '*.md' 2>/dev/null | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### 🐳 Docker Information:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Dockerfile size:** $(wc -l < Dockerfile) lines" >> $GITHUB_STEP_SUMMARY
+        echo "- **Docker-compose services:** $(docker-compose config --services | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### ✅ Infrastructure Status:" >> $GITHUB_STEP_SUMMARY
+        echo "All required files and directories are present." >> $GITHUB_STEP_SUMMARY
+
+  # =====================================
+  # JOB 7: PERFORMANCE BENCHMARK
+  # =====================================
+  performance-test:
+    name: Container Performance Test
+    runs-on: ubuntu-latest
+    needs: container-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download Docker image
+      uses: actions/download-artifact@v3
+      with:
+        name: docker-image-linux/amd64
+        path: /tmp
+    
+    - name: Load Docker image
+      run: |
+        docker load --input /tmp/bdfut-linux/amd64.tar
+        docker tag bdfut:test-linux/amd64 bdfut:latest
+    
+    - name: Run performance benchmarks
+      run: |
+        echo "⚡ Running container performance tests..."
+        
+        # Medir tempo de inicialização
+        START_TIME=$(date +%s%N)
+        docker run --rm bdfut:latest python -c "print('Container started')"
+        END_TIME=$(date +%s%N)
+        STARTUP_TIME=$(( (END_TIME - START_TIME) / 1000000 ))
+        
+        echo "## ⚡ Performance Report" >> $GITHUB_STEP_SUMMARY
+        echo "- **Container startup time:** ${STARTUP_TIME}ms" >> $GITHUB_STEP_SUMMARY
+        
+        # Medir tamanho da imagem
+        IMAGE_SIZE=$(docker images bdfut:latest --format "{{.Size}}")
+        echo "- **Image size:** $IMAGE_SIZE" >> $GITHUB_STEP_SUMMARY
+        
+        # Verificar se o tempo de startup está dentro do limite aceitável (< 5s)
+        if [ $STARTUP_TIME -lt 5000 ]; then
+          echo "✅ Container startup time is acceptable"
+        else
+          echo "⚠️ Container startup time is slow (>${STARTUP_TIME}ms)"
+        fi

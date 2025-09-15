@@ -1,0 +1,7 @@
+# statistics
+
+**URL:** https://docs.sportmonks.com/football/endpoints-and-entities/endpoints/statistics.md
+
+---
+
+# \# Statistics\n\nThese endpoints allow you to retrieve statistics per season, round, and stage.\&#x20;\n\nUse one of our 3 statistics endpoints. Per endpoint, you can find the details, including base URL, parameters, includes and more.\&#x20;\n\n\* \*\*GET Season Statistics by Participant:\*\* returns statistics by season for the given participant.\n\* \*\*GET Stage Statistics:\*\* returns statistics by the given stage ID.\n\* \*\*GET Round Statistics:\*\* returns statistics by the given round ID.\n\nYou can find an overview of all the statistics we offer below.\n\n<table data-view=\"cards\" data-full-width=\"false\"><thead><tr><th></th><th></th><th data-hidden data-card-target data-type=\"content-ref\"></th></tr></thead><tbody><tr><td>**Statistics**</td><td>You can find an overview of all the statistics we offer here.</td><td><a href=\"https://docs.google.com/spreadsheets/d/1dNZqVPJznDtUAjU8110nU\_5Ecukle27IRwDXqXqP\_P0/edit?usp=sharing\">https://docs.google.com/spreadsheets/d/1dNZqVPJznDtUAjU8110nU\_5Ecukle27IRwDXqXqP\_P0/edit?usp=sharing</a></td></tr></tbody></table>
