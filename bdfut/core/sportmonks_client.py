@@ -476,3 +476,51 @@ class SportmonksClient:
             params['include'] = include
         
         return self.get_paginated_data(f'/coaches/teams/{team_id}', params)
+    
+    def get_events_by_fixture(self, fixture_id: int, include: Optional[str] = None) -> List[Dict]:
+        """Busca events de uma fixture específica"""
+        endpoint = f'/fixtures/{fixture_id}'
+        params = {'include': 'events'}
+        if include:
+            params['include'] = f"events,{include}"
+        
+        response = self._make_request(endpoint, params, 'events')
+        if response and response.get('data'):
+            return response['data'].get('events', [])
+        return []
+    
+    def get_statistics_by_fixture(self, fixture_id: int, include: Optional[str] = None) -> List[Dict]:
+        """Busca statistics de uma fixture específica"""
+        endpoint = f'/fixtures/{fixture_id}'
+        params = {'include': 'statistics'}
+        if include:
+            params['include'] = f"statistics,{include}"
+        
+        response = self._make_request(endpoint, params, 'statistics')
+        if response and response.get('data'):
+            return response['data'].get('statistics', [])
+        return []
+    
+    def get_lineups_by_fixture(self, fixture_id: int, include: Optional[str] = None) -> List[Dict]:
+        """Busca lineups de uma fixture específica"""
+        endpoint = f'/fixtures/{fixture_id}'
+        params = {'include': 'lineups'}
+        if include:
+            params['include'] = f"lineups,{include}"
+        
+        response = self._make_request(endpoint, params, 'lineups')
+        if response and response.get('data'):
+            return response['data'].get('lineups', [])
+        return []
+    
+    def get_coaches_by_team(self, team_id: int, include: Optional[str] = None) -> List[Dict]:
+        """Busca coaches de um team específico"""
+        endpoint = f'/teams/{team_id}'
+        params = {'include': 'coaches'}
+        if include:
+            params['include'] = f"coaches,{include}"
+        
+        response = self._make_request(endpoint, params, 'coaches')
+        if response and response.get('data'):
+            return response['data'].get('coaches', [])
+        return []

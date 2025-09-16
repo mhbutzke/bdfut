@@ -129,26 +129,82 @@
 
 ---
 
-## 📊 PROGRESSO GERAL
+### TASK-FE-007: Integração Real com Dados ETL
+**Status:** 🔴 CRÍTICA - RECOMENDADA  
+**Prioridade:** 007  
+**Estimativa:** 1-2 dias  
+**Objetivo:** Conectar dashboard com dados reais do Supabase (substituir mock data)
 
-**Tasks Concluídas:** 6/6 (100%)  
-**Tasks em Andamento:** 0/6 (0%)  
-**Tasks Pendentes:** 0/6 (0%)  
-**Tasks Críticas:** 0/6 (0%)
+**Dependência:** ✅ TASK-FE-006 CONCLUÍDA
+
+**Critérios de Sucesso:**
+- [ ] Substituir mock data por dados reais do Supabase
+- [ ] Integrar com tabelas ETL (etl_jobs, fixtures, players, etc.)
+- [ ] Configurar queries reais para métricas
+- [ ] Testar dashboard com dados de produção
+- [ ] Validar performance com volume real
+
+**Entregáveis:**
+- Hooks atualizados com queries reais
+- Dashboard funcional com dados reais
+- Configuração de conexão Supabase
+- Testes de integração
+
+**Justificativa:** Dashboard precisa mostrar dados reais para ser funcional
 
 ---
 
-## 🎯 PRÓXIMAS AÇÕES
+### TASK-FE-008: Implementar Testes de Componentes
+**Status:** 🟠 IMPORTANTE - RECOMENDADA  
+**Prioridade:** 008  
+**Estimativa:** 1-2 dias  
+**Objetivo:** Implementar testes unitários para componentes críticos
 
-🎉 **TODAS AS TASKS CONCLUÍDAS!** 🎉
+**Dependência:** ✅ TASK-FE-007 deve estar CONCLUÍDA
 
-**Status:** ✅ **FILA FRONTEND 100% COMPLETA**
+**Critérios de Sucesso:**
+- [ ] Testes para componentes UI principais (Button, Card, DataTable)
+- [ ] Testes para hooks customizados (useETLData, useDataQuality)
+- [ ] Testes de integração com Supabase
+- [ ] Cobertura ≥70% dos componentes críticos
+- [ ] Testes E2E para fluxos principais
 
-**Próximos Passos:**
-1. **Aguardar:** Próxima fila de tasks do projeto
-2. **Manutenção:** Monitorar performance e bugs
-3. **Melhorias:** Implementar feedback dos usuários
-4. **Documentação:** Atualizar guias de uso
+**Entregáveis:**
+- Suite de testes para componentes
+- Testes de hooks customizados
+- Configuração de coverage
+- Documentação de testes
+
+**Justificativa:** Garantir qualidade e estabilidade dos componentes
+
+---
+
+## 📊 PROGRESSO GERAL
+
+**FASE 1 - CONCLUÍDA:** 6/6 (100%) - TODAS AS TASKS BÁSICAS CONCLUÍDAS! 🎉  
+**FASE 2 - RECOMENDADA:** 2/2 (0%) - MELHORIAS CRÍTICAS IDENTIFICADAS  
+**Tasks Totais:** 6/8 (75%)  
+**Tasks em Andamento:** 0/8 (0%)  
+**Tasks Pendentes:** 2/8 (25%)  
+**Próxima Task:** TASK-FE-007 (RECOMENDADA)
+
+---
+
+## 🎯 PRÓXIMAS AÇÕES SEQUENCIAIS
+
+### **✅ FASE 1 - CONCLUÍDA:**
+1. ✅ **CONCLUÍDO:** TASK-FE-001 (Framework)
+2. ✅ **CONCLUÍDO:** TASK-FE-002 (Componentes)
+3. ✅ **CONCLUÍDO:** TASK-FE-003 (Rotas)
+4. ✅ **CONCLUÍDO:** TASK-FE-004 (Estado)
+5. ✅ **CONCLUÍDO:** TASK-FE-005 (Dashboard)
+6. ✅ **CONCLUÍDO:** TASK-FE-006 (Autenticação)
+
+### **🔄 FASE 2 - MELHORIAS RECOMENDADAS:**
+7. **IMEDIATO:** Iniciar TASK-FE-007 (Integração dados reais) - **CRÍTICA**
+8. **APÓS FE-007:** Iniciar TASK-FE-008 (Testes componentes) - **IMPORTANTE**
+
+**Status:** ✅ **FASE 1 COMPLETA** + 🔄 **FASE 2 RECOMENDADA**
 
 ---
 
