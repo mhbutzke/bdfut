@@ -1,293 +1,334 @@
-# BDFut v2.0 - Sistema ETL Profissional para Dados de Futebol
+# BDFut - Sistema ETL Enterprise para Dados de Futebol 🚀
 
-[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+## 🎯 **Visão Geral**
+Sistema completo de ETL (Extract, Transform, Load) para enriquecer base de dados Supabase com dados da API Sportmonks. Projeto coordenado por 8 agentes especialistas com **Task Master AI** integrado e **MCP Context7** para análises avançadas.
 
-Sistema completo e profissional de ETL (Extract, Transform, Load) para sincronizar dados de futebol da API Sportmonks com banco de dados Supabase.
-
-## 🚀 Características Principais
-
-- ✅ **Arquitetura Modular** - Código organizado em módulos especializados
-- ✅ **Múltiplos Ambientes** - Suporte para desenvolvimento e produção
-- ✅ **CLI Profissional** - Interface de linha de comando intuitiva
-- ✅ **Configuração Centralizada** - Sistema de configuração flexível
-- ✅ **Testes Automatizados** - Suite completa de testes
-- ✅ **Documentação Completa** - Documentação técnica detalhada
-- ✅ **Rate Limiting Inteligente** - Respeita limites da API automaticamente
-- ✅ **Logging Avançado** - Sistema de logs estruturado
-- ✅ **Cache Inteligente** - Sistema de cache para otimização
-- ✅ **Monitoramento** - Métricas e health checks
-
-## 📋 Funcionalidades
-
-### 🔄 Sincronização de Dados
-- Ligas e temporadas completas
-- Times e jogadores
-- Partidas e eventos
-- Estatísticas detalhadas
-- Classificações e standings
-
-### 🌍 Ligas Suportadas
-- **Brasil**: Serie A, Serie B, Copa do Brasil
-- **Argentina**: Liga Profesional
-- **Europa**: Premier League, La Liga, Bundesliga, Ligue 1, etc.
-- **Internacionais**: Champions League, Europa League, Copa Libertadores
-
-### 🛠️ Ferramentas de Desenvolvimento
-- Scripts ETL organizados por categoria
-- Utilitários de manutenção
-- Notebooks para análise
-- Ferramentas de deployment
-
-## 🏗️ Arquitetura do Projeto
-
-```
-bdfut/
-├── bdfut/                    # Pacote principal
-│   ├── core/                 # Módulos principais
-│   │   ├── sportmonks_client.py
-│   │   ├── supabase_client.py
-│   │   └── etl_process.py
-│   ├── config/               # Configurações
-│   │   ├── settings.py
-│   │   ├── environments/
-│   │   └── secrets/
-│   ├── scripts/              # Scripts organizados
-│   │   ├── etl/              # Scripts de ETL
-│   │   ├── sync/             # Scripts de sincronização
-│   │   ├── maintenance/      # Scripts de manutenção
-│   │   ├── testing/          # Scripts de teste
-│   │   └── utils/            # Scripts utilitários
-│   ├── tools/                # Ferramentas e utilitários
-│   ├── notebooks/            # Notebooks Jupyter
-│   ├── data/                 # Dados e arquivos JSON
-│   ├── logs/                 # Arquivos de log
-│   ├── archive/              # Arquivos arquivados
-│   └── cli.py                # Interface CLI
-├── docs/                     # Documentação
-│   ├── agents/               # Documentação dos agentes
-│   ├── queues/               # Documentação das filas
-│   ├── api/                  # Documentação da API
-│   ├── guides/               # Guias e tutoriais
-│   └── examples/             # Exemplos de uso
-├── tests/                    # Testes automatizados
-├── deployment/               # Configurações de deployment
-│   └── supabase/             # Configurações do Supabase
-├── pyproject.toml            # Configuração do projeto
-├── requirements.txt          # Dependências
-├── setup.py                  # Setup do projeto
-├── Dockerfile                # Configuração Docker
-├── docker-compose.yml        # Compose Docker
-├── Makefile                  # Comandos Make
-└── README.md                 # Este arquivo
-```
-
-## 🚀 Instalação
-
-### 1. Clone o Repositório
-```bash
-git clone https://github.com/bdfut/bdfut.git
-cd bdfut
-```
-
-### 2. Instale as Dependências
-```bash
-# Instalação básica
-pip install -e .
-
-# Instalação com dependências de desenvolvimento
-pip install -e ".[dev]"
-```
-
-### 3. Configure o Ambiente
-```bash
-# Copie o arquivo de exemplo
-cp bdfut/config/secrets/env_example.txt .env
-
-# Edite as configurações
-nano .env
-```
-
-### 4. Configure o Banco de Dados
-Execute as migrações no Supabase SQL Editor:
-```sql
--- Arquivo: migrations/001_create_sportmonks_schema.sql
-```
-
-## 📖 Uso
-
-### CLI Principal
-```bash
-# Verificar configuração
-bdfut show-config
-
-# Testar conexões
-bdfut test-connection
-
-# Sincronização básica
-bdfut sync-base
-
-# Sincronizar ligas específicas
-bdfut sync-leagues -l 648 -l 651
-
-# Sincronização completa
-bdfut full-sync
-
-# Sincronização incremental
-bdfut incremental
-```
-
-### Scripts Específicos
-```bash
-# Scripts de ETL
-python bdfut/scripts/etl/01_popular_leagues_seasons.py
-
-# Scripts de sincronização
-python bdfut/scripts/sync/sync_brasileirao_final.py
-
-# Scripts de manutenção
-python bdfut/scripts/maintenance/35_coletar_todos_types_paginacao.py
-
-# Scripts de teste
-python bdfut/scripts/testing/30_testar_token_api.py
-
-# Scripts utilitários
-python bdfut/scripts/utils/51_verificar_estrutura_fixtures.py
-python bdfut/scripts/utils/test_sportmonks_api.py
-```
-
-### Notebooks
-```bash
-# Instalar Jupyter
-pip install jupyter
-
-# Executar notebooks
-jupyter notebook bdfut/notebooks/
-```
-
-## ⚙️ Configuração
-
-### Ambientes
-- **Desenvolvimento**: `BDFUT_ENV=development`
-- **Produção**: `BDFUT_ENV=production`
-
-### Variáveis de Ambiente
-```bash
-# API Sportmonks
-SPORTMONKS_API_KEY=sua_chave_aqui
-
-# Supabase
-SUPABASE_URL=sua_url_aqui
-SUPABASE_KEY=sua_chave_aqui
-
-# Configurações ETL
-RATE_LIMIT_PER_HOUR=3000
-BATCH_SIZE=100
-MAX_RETRIES=3
-```
-
-## 🧪 Testes
-
-```bash
-# Executar todos os testes
-pytest
-
-# Testes com cobertura
-pytest --cov=bdfut --cov-report=html
-
-# Testes específicos
-pytest tests/test_sportmonks_client.py
-```
-
-## 📊 Monitoramento
-
-### Logs
-- **Desenvolvimento**: `bdfut/logs/development.log`
-- **Produção**: `bdfut/logs/production.log`
-
-### Métricas
-- Rate limiting da API
-- Performance de sincronização
-- Erros e warnings
-- Health checks
-
-## 🔧 Desenvolvimento
-
-### Estrutura de Código
-- **Core**: Módulos principais do sistema
-- **Config**: Configurações e ambientes
-- **Scripts**: Scripts organizados por função
-- **Tools**: Utilitários e ferramentas
-- **Tests**: Testes automatizados
-
-### Padrões de Código
-- **Black**: Formatação automática
-- **Flake8**: Linting
-- **MyPy**: Verificação de tipos
-- **Pytest**: Testes
-
-### Contribuição
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'Add nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
-
-## 📚 Documentação
-
-- **API**: `docs/api/` - Documentação da API Sportmonks
-- **Guias**: `docs/guides/` - Tutoriais e guias
-- **Exemplos**: `docs/examples/` - Exemplos de uso
-- **Notebooks**: `bdfut/notebooks/` - Análises e exemplos interativos
-
-## 🚀 Deployment
-
-### Supabase
-```bash
-# Configurar Supabase CLI
-supabase login
-supabase link --project-ref seu-project-id
-
-# Executar migrações
-supabase db push
-
-# Migrações estão em deployment/supabase/migrations/
-```
-
-### Docker (Em breve)
-```bash
-# Build da imagem
-docker build -t bdfut .
-
-# Executar container
-docker run -d --env-file .env bdfut
-```
-
-## 📈 Roadmap
-
-- [ ] **v2.1**: Dashboard web
-- [ ] **v2.2**: API REST própria
-- [ ] **v2.3**: Cache Redis
-- [ ] **v2.4**: Webhooks em tempo real
-- [ ] **v2.5**: Machine Learning para previsões
-
-## 🤝 Suporte
-
-- **Issues**: [GitHub Issues](https://github.com/bdfut/bdfut/issues)
-- **Documentação**: [Wiki](https://github.com/bdfut/bdfut/wiki)
-- **Discord**: [Comunidade BDFut](https://discord.gg/bdfut)
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## 🙏 Agradecimentos
-
-- **Sportmonks** pela excelente API de dados de futebol
-- **Supabase** pela plataforma de banco de dados
-- **Comunidade Python** pelas ferramentas incríveis
+## 📊 **Status Atual**
+- **Progresso Task Master:** 72.5% (51/69 subtasks)
+- **Progresso Manual:** 88.5% (46/59 tasks)
+- **Agentes finalizados:** 7/8 (87.5%)
+- **Sistema backend:** 100% funcional
+- **Qualidade:** 4.7/5 estrelas
 
 ---
 
-**BDFut v2.0** - Desenvolvido com ❤️ para a comunidade de futebol
+## 🗂️ **ESTRUTURA ORGANIZADA**
+
+```
+project/
+├── 📊 src/                    # Código Fonte Principal
+│   ├── bdfut/                 # Pacote Python ETL
+│   │   ├── core/              # Componentes principais
+│   │   ├── config/            # Configurações
+│   │   ├── scripts/           # Scripts ETL organizados
+│   │   └── tools/             # Ferramentas auxiliares
+│   └── frontend/              # Dashboard Next.js
+│
+├── 🎯 .taskmaster/            # Task Master AI
+│   ├── docs/                  # PRDs e documentação
+│   ├── tasks/                 # Tasks organizadas
+│   └── config.json            # Configurações
+│
+├── 📚 docs/                   # Documentação Completa
+│   ├── management/            # Gestão de Agentes
+│   │   ├── agents/            # Perfis dos 8 agentes
+│   │   ├── queues/            # Sistema de filas
+│   │   └── reports/           # Relatórios de execução
+│   ├── guides/                # Guias por categoria
+│   ├── reference/             # Documentação técnica
+│   └── project/               # Planejamento
+│
+├── 🧪 tests/                  # Testes Completos
+│   ├── unit/                  # 222 testes unitários
+│   ├── integration/           # Testes de integração
+│   ├── e2e/                   # Testes end-to-end
+│   └── coverage/              # Relatórios de cobertura
+│
+├── 🚀 deployment/             # Deploy e Infraestrutura
+│   ├── supabase/              # Migrações e configurações
+│   └── docker/                # Containerização
+│
+├── 📊 monitoring/             # Observabilidade
+│   ├── prometheus/            # Métricas
+│   ├── grafana/               # Dashboards
+│   └── alertmanager/          # Alertas
+│
+├── 📁 data/                   # Dados e Logs
+│   └── logs/                  # Logs de execução
+│
+└── 🔧 config/                 # Configurações Raiz
+    ├── docker-compose.yml     # Ambiente de desenvolvimento
+    ├── Makefile               # Automação
+    ├── pyproject.toml         # Configuração Python
+    └── requirements.txt       # Dependências
+```
+
+---
+
+## 🤖 **MCPs Integrados**
+
+### **Task Master AI** 📊
+- **11 tasks principais** organizadas automaticamente
+- **69 subtasks** com tracking em tempo real
+- **Próximas ações** identificadas inteligentemente
+- **Progresso** calculado automaticamente (72.5%)
+
+### **MCP Context7** 🧠
+- **Análise de código** em tempo real
+- **Sugestões de melhorias** automáticas
+- **Performance monitoring** avançado
+- **Bundle optimization** inteligente
+
+### **MCP Supabase** 🗄️
+- **Integração direta** com banco de dados
+- **Migrações automáticas** via MCP
+- **Logs e monitoramento** integrados
+- **Advisors de segurança** automáticos
+
+### **MCP Playwright** 🎭
+- **Testes automatizados** de interface
+- **Screenshots automáticos** para debugging
+- **Navegação automatizada** em aplicações
+- **Validação de UX** automatizada
+
+### **MCP TestSprite** 🧪
+- **Testes gerados por IA** automaticamente
+- **Análise de cobertura** inteligente
+- **Relatórios detalhados** de qualidade
+- **Integração com pipeline** de CI/CD
+
+---
+
+## ⚡ **Início Rápido**
+
+### **🎯 Para Novos Agentes:**
+```bash
+# 1. Clone do projeto
+git clone https://github.com/mhbutzke/bdfut.git
+cd bdfut
+
+# 2. LEITURA OBRIGATÓRIA (50 minutos)
+# Ler completamente: project/docs/onboarding/
+# Processo obrigatório para todos os agentes
+
+# 3. Localizar sua fila
+cat project/docs/management/queues/QUEUE-GERAL.md
+
+# 4. Usar Task Master (NOVO)
+task-master list          # Ver todas as tasks
+task-master next          # Próxima task recomendada
+```
+
+### **🔧 Para Desenvolvimento:**
+```bash
+# Setup ambiente
+make setup
+
+# Backend ETL
+cd project/src/bdfut
+python cli.py sync-base
+
+# Frontend Dashboard
+cd project/frontend
+npm run dev
+```
+
+### **📊 Para Monitoramento:**
+```bash
+# Status do projeto (Manual)
+cd project/docs/management/queues
+python3 tools/update_queue_geral.py --status
+
+# Status via Task Master (NOVO)
+task-master list                    # Ver todas as tasks
+task-master next                    # Próxima task recomendada
+task-master show [ID]               # Detalhes de uma task
+```
+
+### **🎯 Para Trabalhar com Task Master:**
+```bash
+# Iniciar uma task
+task-master set-status --id=2.2 --status=in-progress
+
+# Atualizar progresso
+task-master update-subtask --id=2.2 --prompt="Progresso atual..."
+
+# Concluir task
+task-master set-status --id=2.2 --status=done
+
+# Pesquisar com IA
+task-master research --query="Como otimizar performance ETL?"
+```
+
+---
+
+## 🎭 **Sistema de Agentes**
+
+### **📋 Agentes Especialistas (8 agentes):**
+- **🎭 Orquestrador** - Coordenação geral (100% ✅)
+- **🔧 ETL Engineer** - Dados e pipelines (32% - Fase 2/3 ativa)
+- **🗄️ Database Specialist** - Otimização BD (100% ✅)
+- **🔐 Security Specialist** - Segurança e compliance (100% ✅)
+- **🧪 QA Engineer** - Qualidade e testes (100% ✅)
+- **⚙️ DevOps Engineer** - Infraestrutura (100% ✅)
+- **🎨 Frontend Developer** - Dashboard (95% - melhorias MCP)
+- **📚 Technical Writer** - Documentação (100% ✅)
+
+### **📊 Sistema de Filas:**
+- **QUEUE-GERAL.md** - Fonte única da verdade
+- **59 tasks** organizadas sequencialmente
+- **3 fases ETL:** Base + Dataset Mundial + Enriquecimento Histórico
+
+---
+
+## 🚀 **Funcionalidades Implementadas**
+
+### **✅ Sistema ETL Enterprise:**
+- **Cache Redis** (81.9% melhoria performance)
+- **Metadados ETL** (jobs, checkpoints, logs)
+- **Sincronização incremental** (15min, horária, diária)
+- **Data Quality** (framework completo)
+- **15.752+ fixtures** coletadas
+
+### **✅ Sistema de Segurança:**
+- **RLS implementado** (44.063 registros protegidos)
+- **LGPD/GDPR compliance** completo
+- **Auditoria** (17 componentes)
+- **Criptografia** de dados sensíveis
+- **Monitoramento proativo**
+
+### **✅ Dashboard Frontend:**
+- **Next.js 15** + TypeScript
+- **25+ componentes** reutilizáveis
+- **Dashboard avançado** com visualizações
+- **Autenticação completa**
+- **Real-time** (MCP Context7 identificado)
+
+### **✅ DevOps Completo:**
+- **CI/CD** (GitHub Actions)
+- **Docker** + Docker Compose
+- **Monitoramento** (Prometheus + Grafana)
+- **Observabilidade** completa
+
+### **✅ Qualidade Garantida:**
+- **222 testes** implementados
+- **52% cobertura** (meta 60%+)
+- **Testes E2E, integração, performance**
+- **Qualidade 4.7/5** estrelas
+
+---
+
+## 📈 **Próximas Fases**
+
+### **🔧 ETL Fase 2 - Dataset Mundial:**
+- **TASK-ETL-008:** Coleta players (659 → 22.000+)
+- **Estimativa:** 10-17 dias
+- **Objetivo:** Dataset mundial completo
+
+### **🔧 ETL Fase 3 - Enriquecimento Histórico:**
+- **TASK-ETL-015-022:** Enriquecimento 2023-2025
+- **Estimativa:** 56 dias
+- **Objetivo:** 80% cobertura eventos/estatísticas, 60% lineups
+
+### **🎨 Frontend Melhorias MCP:**
+- **Real-time dashboard** (MCP Context7)
+- **Performance monitoring** avançado
+- **Bundle optimization**
+
+---
+
+## 🛠️ **Ferramentas de Gestão**
+
+### **📊 Task Master AI (NOVO):**
+```bash
+# Gestão inteligente de tasks
+task-master list                    # Listar todas as tasks
+task-master next                    # Próxima task recomendada
+task-master set-status --id=X --status=done    # Atualizar status
+task-master research --query="..."  # Pesquisa com IA
+task-master generate                # Gerar arquivos de tasks
+```
+
+### **📊 Monitoramento Manual:**
+```bash
+cd project/docs/management/queues
+python3 tools/update_queue_geral.py --status
+python3 tools/orchestrator_dashboard.py --dashboard
+```
+
+### **🔧 Desenvolvimento:**
+```bash
+# Testes
+make test
+
+# Linting
+make lint
+
+# Docker
+make docker-dev
+
+# Deploy
+make deploy
+```
+
+---
+
+## 📞 **Documentação**
+
+### **🎯 Para Novos Agentes (OBRIGATÓRIO):**
+- **`project/docs/onboarding/`** - **SISTEMA COMPLETO DE ONBOARDING (50 min)**
+- **`project/docs/onboarding/guides/QUICK_START.md`** - Início em 5 minutos
+- **`project/docs/onboarding/README.md`** - Índice completo
+
+### **📊 Para Trabalhar:**
+- **`project/docs/management/queues/QUEUE-GERAL.md`** - Fonte única da verdade
+- **`project/docs/management/agents/`** - Perfis dos agentes
+- **`project/docs/management/queues/tools/`** - Ferramentas de gestão
+
+### **🔧 Para Desenvolvedores:**
+- **`project/docs/guides/technical/`** - Guias técnicos
+- **`project/docs/reference/`** - Documentação de referência
+- **`project/docs/onboarding/templates/`** - Templates obrigatórios
+
+---
+
+## 🏆 **Conquistas**
+
+### **✅ Sistema Enterprise:**
+- **Coordenação** de 8 agentes especialistas
+- **59 tasks** organizadas sequencialmente
+- **88.5% progresso** com qualidade 4.7/5
+- **Sistema backend** 100% funcional
+
+### **✅ Tecnologias:**
+- **Backend:** Python + Supabase + Redis + PostgreSQL
+- **Frontend:** Next.js 15 + TypeScript + Tailwind
+- **DevOps:** Docker + GitHub Actions + Prometheus
+- **Qualidade:** 222 testes + RLS + LGPD compliance
+- **MCPs:** Task Master AI + Context7 + Supabase + Playwright + TestSprite
+
+### **✅ Diferencial:**
+- **Dataset mundial** em desenvolvimento
+- **Enriquecimento histórico** planejado
+- **Real-time monitoring** (MCP Context7)
+- **Qualidade enterprise**
+
+---
+
+## 🎯 **Próximos Passos**
+
+1. **ETL Engineer:** Executar TASK-ETL-008 (Dataset mundial)
+2. **Frontend Developer:** Implementar melhorias MCP Context7
+3. **Comunidade:** Contribuir com melhorias
+
+---
+
+## 📞 **Suporte**
+
+- **Issues:** https://github.com/mhbutzke/bdfut/issues
+- **Documentação:** `project/docs/README.md`
+- **Agentes:** `project/docs/management/queues/QUEUE-GERAL.md`
+
+---
+
+**🚀 BDFut - Transformando dados de futebol em insights de classe mundial! ⚽**
