@@ -1,0 +1,43 @@
+# Task ID: 2
+# Title: Implementar Coleta Incremental Otimizada
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Desenvolver sistema de coleta incremental baseado em timestamps e flags de controle para evitar reprocessamento desnecessário
+# Details:
+Implementar sistema que identifica: fixtures novas desde última coleta, fixtures atualizadas (mudança de status), fixtures que precisam de enriquecimento (events, lineups, statistics). Usar campos last_processed_at e etl_version para controle.
+
+# Test Strategy:
+Executar coleta incremental e verificar se apenas dados novos/atualizados são processados.
+
+# Subtasks:
+## 1. Implementar Query de Coleta Incremental [done]
+### Dependencies: None
+### Description: Criar função SQL para identificar fixtures que precisam ser coletadas/atualizadas
+### Details:
+Implementar query que identifica: fixtures novas (last_processed_at IS NULL), fixtures atualizadas (updated_at > last_processed_at), fixtures com dados incompletos (has_events=false OR has_lineups=false OR has_statistics=false). Usar índices otimizados criados na Task 1.
+
+## 2. Criar Script Python de Coleta Incremental [done]
+### Dependencies: 2.1
+### Description: Desenvolver script Python que executa coleta incremental usando Sportmonks API
+### Details:
+Implementar script que: 1) Executa query de coleta incremental, 2) Faz chamadas à API Sportmonks com includes apropriados, 3) Atualiza last_processed_at e etl_version, 4) Implementa rate limiting e retry logic, 5) Logs detalhados para monitoramento.
+
+## 3. Implementar Sistema de Chunks por Liga/Temporada [done]
+### Dependencies: 2.1
+### Description: Criar sistema de processamento em chunks para otimizar performance
+### Details:
+Implementar lógica que divide coleta por liga/temporada usando índices idx_fixtures_league_season. Processar chunks de 100-500 fixtures por vez para evitar timeout e otimizar uso de memória. Implementar checkpoint entre chunks.
+
+## 4. Implementar Monitoramento e Logs [done]
+### Dependencies: 2.2
+### Description: Criar sistema de monitoramento para coleta incremental
+### Details:
+Implementar: 1) Logs estruturados com timestamps, 2) Métricas de performance (fixtures processadas/minuto), 3) Alertas para falhas de API, 4) Dashboard de status da coleta, 5) Relatórios de qualidade de dados.
+
+## 5. Testar e Validar Coleta Incremental [done]
+### Dependencies: 2.2, 2.3, 2.4
+### Description: Executar testes completos do sistema de coleta incremental
+### Details:
+Implementar testes que verificam: 1) Coleta apenas de dados novos/atualizados, 2) Performance com diferentes volumes de dados, 3) Recuperação de falhas, 4) Qualidade dos dados coletados, 5) Integridade dos metadados ETL.
+

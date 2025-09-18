@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Criar Views Otimizadas para Consultas
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Implementar views agregadas para fixtures completas, estatísticas por liga/temporada e consultas de livescores
+# Details:
+Criar views: v_fixtures_complete (dados agregados completos), v_fixtures_summary (listagens rápidas), v_league_season_stats (estatísticas por liga), v_fixtures_today (livescores), v_top_scoring_matches (rankings). Otimizar para consultas frequentes do frontend e APIs.
+
+# Test Strategy:
+Testar performance das views com consultas reais, verificar se retornam dados corretos e medir tempo de resposta comparado com queries diretas.

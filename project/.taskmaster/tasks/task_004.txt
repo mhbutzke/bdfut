@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Validar Integridade e Qualidade dos Dados
+# Status: pending
+# Dependencies: 3
+# Priority: high
+# Description: Executar validação completa da integridade referencial, completude dos dados e consistência com API Sportmonks
+# Details:
+Usar database_validator.py para executar validações: integridade referencial entre tabelas, fixtures órfãs, placares negativos, datas inconsistentes, completude dos dados essenciais. Gerar relatório detalhado de qualidade e identificar problemas críticos.
+
+# Test Strategy:
+Executar todas as validações e verificar se taxa de sucesso é > 95%. Corrigir falhas críticas identificadas.

@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Melhoria do Pipeline CI/CD
+# Status: pending
+# Dependencies: 3, 5
+# Priority: medium
+# Description: Otimizar pipeline de deploy, implementar blue-green deployment e automatizar rollbacks
+# Details:
+Configurar: pipeline CI/CD otimizado, blue-green deployment para zero downtime, rollbacks automáticos em caso de falha, ambientes isolados (dev/staging/prod), deploy automático após testes, notificações de deploy.
+
+# Test Strategy:
+Executar deploy completo e testar rollback automático. Verificar zero downtime durante deploy.

@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Padronizar Estrutura das Demais Tabelas
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Aplicar padronização nas tabelas teams, players, leagues e outras, adicionando campos faltantes da API
+# Details:
+Criar migrations para: teams (display_name, official_name, national_team), players (detailed_position_id, market_value_id, injured), leagues (melhorar campos existentes), referees/coaches (campos adicionais). Manter consistência com nomenclatura da API.
+
+# Test Strategy:
+Verificar se todas as colunas foram adicionadas e se dados existentes foram preservados. Testar integridade referencial.

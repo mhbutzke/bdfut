@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Sistema de Monitoramento Avançado
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Implementar dashboard Grafana, alertas Prometheus e logs estruturados
+# Details:
+Configurar: dashboard Grafana com métricas de ETL, alertas Prometheus para falhas críticas, logs estruturados com timestamp e contexto, métricas de qualidade de dados em tempo real, alertas para degradação de performance.
+
+# Test Strategy:
+Simular falhas e verificar se alertas são disparados corretamente. Verificar se métricas são coletadas adequadamente.

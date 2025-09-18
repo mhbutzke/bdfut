@@ -1,0 +1,11 @@
+# Task ID: 1
+# Title: Estruturação do Ambiente de Desenvolvimento
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Padronizar configurações de desenvolvimento, implementar pre-commit hooks e criar scripts de setup automatizado
+# Details:
+Implementar: pre-commit hooks para linting automático, configurações padronizadas de IDE, scripts de setup do ambiente (make setup), validação de dependências, configuração de variáveis de ambiente. Garantir que novo desenvolvedor consiga configurar ambiente em < 15 minutos.
+
+# Test Strategy:
+Testar setup em ambiente limpo e verificar se todos os hooks e validações funcionam corretamente.

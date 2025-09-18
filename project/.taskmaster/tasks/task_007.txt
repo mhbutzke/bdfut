@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Implementar Sistema de Monitoramento de Qualidade
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Criar dashboard e alertas automáticos para monitorar qualidade dos dados e performance do ETL
+# Details:
+Implementar: dashboard Grafana com métricas de qualidade, alertas automáticos para falhas ETL, relatórios diários de completude, monitoramento de performance das consultas, alertas para dados inconsistentes ou faltantes.
+
+# Test Strategy:
+Verificar se alertas são disparados corretamente para problemas simulados e se dashboard mostra métricas em tempo real.

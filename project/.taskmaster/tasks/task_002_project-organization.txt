@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Otimização do Sistema ETL
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Melhorar rate limiting, cache Redis e implementar pipeline de processamento assíncrono
+# Details:
+Otimizar: rate limiting inteligente com backoff exponencial, cache Redis com TTL configurável, processamento assíncrono com filas, retry policies robustas, monitoramento de performance do ETL. Implementar circuit breaker para APIs externas.
+
+# Test Strategy:
+Testar ETL com alta carga e verificar se rate limiting e cache funcionam corretamente.

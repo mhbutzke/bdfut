@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Automatizar Enriquecimento de Fixtures
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Criar processo automático para enriquecer fixtures com dados completos (events, lineups, statistics, participants)
+# Details:
+Implementar coleta automática de: events (gols, cartões, substituições), lineups (escalações, formações), statistics (chutes, posse, passes), participants (team IDs corretos), referees, periods. Usar endpoint multi para otimização.
+
+# Test Strategy:
+Verificar se fixtures são enriquecidas com todos os dados disponíveis e se flags (has_events, has_lineups) são atualizadas.

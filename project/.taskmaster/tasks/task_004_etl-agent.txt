@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Sistema de Validação de Dados ETL
+# Status: pending
+# Dependencies: 2, 3
+# Priority: medium
+# Description: Implementar validação automática de qualidade dos dados coletados e integridade referencial
+# Details:
+Criar sistema que valida: integridade referencial entre tabelas, completude dos dados obrigatórios, consistência de formatos (datas, IDs), detecção de duplicatas, validação de constraints. Gerar relatórios automáticos de qualidade.
+
+# Test Strategy:
+Executar validação completa e verificar se score de qualidade > 95%.

@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Otimizar Performance com Índices Especializados
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Implementar índices compostos especializados para consultas frequentes e otimizar performance geral do banco
+# Details:
+Criar índices compostos para: consultas por data + liga, consultas por times, rankings de gols, fixtures com dados completos. Analisar planos de execução das queries mais frequentes e otimizar conforme necessário. Implementar particionamento se necessário.
+
+# Test Strategy:
+Medir tempo de resposta das consultas antes e depois dos índices. Meta: redução de 50% no tempo de consultas agregadas.

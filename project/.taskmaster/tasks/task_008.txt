@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Criar Scripts de Manutenção e Limpeza
+# Status: pending
+# Dependencies: 6
+# Priority: low
+# Description: Desenvolver scripts automáticos para manutenção da base de dados, limpeza de dados órfãos e otimização contínua
+# Details:
+Criar scripts para: limpeza de registros órfãos, atualização de estatísticas das tabelas, reindexação automática, backup incremental, verificação de espaço em disco, limpeza de cache antigo.
+
+# Test Strategy:
+Executar scripts em ambiente de teste e verificar se limpeza é feita corretamente sem perda de dados importantes.

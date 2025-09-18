@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Documentar Estrutura Final e Criar Guias
+# Status: pending
+# Dependencies: 7
+# Priority: low
+# Description: Documentar a estrutura final do banco de dados, relacionamentos e criar guias de uso das views e APIs
+# Details:
+Criar documentação: diagrama ER atualizado, documentação das views criadas, guia de consultas otimizadas, exemplos de uso das APIs, troubleshooting guide para problemas comuns, documentação para novos desenvolvedores.
+
+# Test Strategy:
+Verificar se documentação está completa e permite que novo desenvolvedor entenda e use a estrutura rapidamente.

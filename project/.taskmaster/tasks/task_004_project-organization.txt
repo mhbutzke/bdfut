@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Documentação e Onboarding
+# Status: pending
+# Dependencies: 1
+# Priority: low
+# Description: Atualizar documentação técnica e criar guias completos de onboarding
+# Details:
+Criar: guias de onboarding para novos desenvolvedores, documentação automática das APIs, exemplos práticos de uso, troubleshooting guides, documentação da arquitetura atualizada. Manter docs sempre atualizadas com CI/CD.
+
+# Test Strategy:
+Validar documentação com novo desenvolvedor seguindo guias do zero.

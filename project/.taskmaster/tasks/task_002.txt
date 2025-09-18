@@ -1,0 +1,49 @@
+# Task ID: 2
+# Title: Implementar Migration para Tabela Fixtures
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Executar migration 001 para adicionar colunas essenciais da API Sportmonks à tabela fixtures, incluindo name, result_info, placares e campos calculados
+# Details:
+Aplicar migration 001_enhance_fixtures_table.sql que adiciona: name (nome da partida), result_info (resultado), home_score/away_score (placares), leg (perna do jogo), campos calculados (total_goals, goal_difference, match_result), metadados ETL e índices de performance. Incluir triggers automáticos para cálculo de resultados.
+
+# Test Strategy:
+Executar migration em ambiente de desenvolvimento, verificar se todas as colunas foram criadas corretamente e testar performance das consultas com novos índices.
+
+# Subtasks:
+## 1. Fazer Backup da Tabela Fixtures [pending]
+### Dependencies: None
+### Description: Criar backup completo da tabela fixtures antes de aplicar qualquer alteração
+### Details:
+Executar pg_dump específico para tabela fixtures: pg_dump -h [host] -U [user] -d [database] -t fixtures > fixtures_backup_$(date +%Y%m%d_%H%M%S).sql. Verificar se backup foi criado corretamente e testar restore em ambiente de teste.
+
+## 2. Executar Migration 001 - Adicionar Colunas Essenciais [pending]
+### Dependencies: 2.1
+### Description: Aplicar migration 001_enhance_fixtures_table.sql para adicionar colunas da API Sportmonks
+### Details:
+Executar migration que adiciona: name, result_info, leg, details, last_processed_at, home_score, away_score, total_goals (calculado), goal_difference (calculado), match_result, metadados ETL. Verificar se todas as colunas foram criadas sem erros.
+
+## 3. Criar Índices de Performance [pending]
+### Dependencies: 2.2
+### Description: Implementar índices compostos para otimizar consultas frequentes na tabela fixtures
+### Details:
+Criar índices: idx_fixtures_name, idx_fixtures_league_season_date, idx_fixtures_date_state, idx_fixtures_teams, idx_fixtures_match_result, idx_fixtures_total_goals, idx_fixtures_data_flags. Analisar planos de execução antes e depois.
+
+## 4. Implementar Triggers Automáticos [pending]
+### Dependencies: 2.2
+### Description: Criar triggers para atualização automática do campo match_result baseado nos placares
+### Details:
+Implementar função calculate_match_result() e trigger update_match_result_trigger para atualizar automaticamente o campo match_result quando home_score, away_score ou state_id forem alterados. Testar com dados reais.
+
+## 5. Atualizar Dados Existentes [pending]
+### Dependencies: 2.4
+### Description: Executar scripts para popular as novas colunas com dados existentes quando possível
+### Details:
+Executar UPDATE para calcular match_result em registros existentes com placares. Identificar fixtures que podem ter name populado a partir de home_team_name + ' vs ' + away_team_name. Atualizar campos de metadados ETL.
+
+## 6. Validar Migration e Performance [pending]
+### Dependencies: 2.5
+### Description: Executar testes completos da migration e medir impacto na performance
+### Details:
+Executar queries de verificação da migration, testar performance das consultas principais, verificar se triggers funcionam corretamente, medir tempo de resposta das consultas otimizadas. Documentar resultados.
+

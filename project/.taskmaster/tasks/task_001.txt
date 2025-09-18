@@ -1,0 +1,11 @@
+# Task ID: 1
+# Title: Análise e Mapeamento da Estrutura Atual do Banco
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Analisar todas as tabelas do Supabase, mapear colunas existentes e comparar com estrutura da API Sportmonks para identificar gaps e oportunidades de melhoria
+# Details:
+Executar análise completa das 25 tabelas principais no Supabase (fixtures, teams, players, leagues, etc.). Mapear todas as colunas existentes e compará-las com os campos retornados pela API Sportmonks. Identificar colunas faltantes, inconsistências de nomenclatura e oportunidades de otimização. Documentar relacionamentos entre tabelas e criar relatório detalhado.
+
+# Test Strategy:
+Executar queries de análise nas tabelas principais e verificar se o mapeamento está completo e correto.

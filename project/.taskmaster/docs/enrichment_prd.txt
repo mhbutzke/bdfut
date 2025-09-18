@@ -1,0 +1,81 @@
+# PRD - Enriquecimento de Tabelas de Eventos, Escalações e Estatísticas
+
+## Objetivo
+Enriquecer as tabelas `match_events`, `match_lineups` e `match_statistics` com dados da API Sportmonks para análise de mercados de cartões e outros eventos de futebol.
+
+## Contexto Atual
+- **Total de fixtures**: 67.085
+- **match_events**: 12.657 registros (705 fixtures únicas)
+- **match_lineups**: 12.893 registros (293 fixtures únicas)  
+- **match_statistics**: 1.412 registros (706 fixtures únicas)
+- **Cobertura atual**: Muito baixa (~1% das fixtures)
+
+## Estrutura das Tabelas
+
+### match_events
+Campos principais: id, fixture_id, type_id, event_type, minute, extra_minute, team_id, player_id, related_player_id, player_name, period_id, result, var, var_reason, coordinates, assist_id, assist_name, injured, on_bench
+
+### match_lineups  
+Campos principais: id, fixture_id, team_id, player_id, player_name, type, position_id, position_name, jersey_number, captain, minutes_played, rating, formation, formation_position, substitute, substitute_in, substitute_out, substitute_minute, substitute_reason
+
+### match_statistics
+Campos principais: id, fixture_id, team_id, shots_total, shots_on_target, shots_inside_box, shots_outside_box, corners, offsides, ball_possession, yellow_cards, red_cards, fouls, passes_total, passes_accurate, pass_percentage, saves, tackles, interceptions, goals, goals_conceded
+
+## Estratégia de Enriquecimento
+
+### Fase 1: Análise e Preparação
+1. Verificar estrutura das tabelas e identificar campos necessários
+2. Testar API Sportmonks para eventos, escalações e estatísticas
+3. Validar mapeamento de dados da API para estrutura das tabelas
+4. Criar scripts de teste com pequenos lotes
+
+### Fase 2: Enriquecimento Incremental por Ano
+1. **2025**: Enriquecer fixtures de 2025 até hoje (6.977 fixtures)
+2. **2024**: Enriquecer fixtures de 2024 (29.483 fixtures)
+3. **2023**: Enriquecer fixtures de 2023 (27.364 fixtures)
+
+### Fase 3: Validação e Otimização
+1. Validar qualidade dos dados coletados
+2. Verificar cobertura por liga e competição
+3. Otimizar scripts para melhor performance
+4. Documentar resultados e métricas
+
+## Requisitos Técnicos
+
+### API Sportmonks
+- Endpoint: `/fixtures/{id}?include=events,lineups,statistics`
+- Rate limiting: Respeitar limites da API
+- Tratamento de erros: Implementar retry e fallback
+- Validação: Verificar integridade dos dados
+
+### Campos Críticos para Mercados de Cartões
+- **Eventos**: Cartões amarelos, cartões vermelhos, faltas, VAR
+- **Escalações**: Titulares, substitutos, minutos jogados
+- **Estatísticas**: Faltas, cartões, posse de bola, passes
+
+### Qualidade de Dados
+- Verificar duplicatas antes de inserir
+- Validar foreign keys (fixture_id, team_id, player_id)
+- Implementar upsert para evitar conflitos
+- Logs detalhados para monitoramento
+
+## Entregáveis
+
+### Scripts de Enriquecimento
+1. Script de teste com validação
+2. Script para 2025 (incremental)
+3. Script para 2024 (batch)
+4. Script para 2023 (batch)
+5. Script de validação e relatórios
+
+### Relatórios de Progresso
+1. Cobertura por ano e liga
+2. Qualidade dos dados coletados
+3. Métricas de performance
+4. Análise de dados para mercados de cartões
+
+## Critérios de Sucesso
+- Cobertura mínima de 80% para fixtures de 2023-2025
+- Dados válidos e consistentes
+- Performance otimizada (rate limiting respeitado)
+- Documentação completa do processo

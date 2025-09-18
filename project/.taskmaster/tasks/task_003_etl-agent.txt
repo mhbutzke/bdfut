@@ -1,0 +1,43 @@
+# Task ID: 3
+# Title: Otimizar Performance do ETL Sportmonks
+# Status: in-progress
+# Dependencies: 1
+# Priority: high
+# Description: Melhorar performance das operações ETL com batch processing, cache inteligente e rate limiting otimizado
+# Details:
+Implementar: batch processing para múltiplas fixtures (endpoint multi), cache Redis com TTL inteligente por tipo de dados, rate limiting baseado em headers reais da API, retry policies com backoff exponencial.
+
+# Test Strategy:
+Medir tempo de execução e taxa de sucesso. Meta: redução de 50% no tempo total de coleta.
+
+# Subtasks:
+## 1. Implementar Batch Processing para Múltiplas Fixtures [pending]
+### Dependencies: None
+### Description: Implementar endpoint multi da API Sportmonks para coletar múltiplas fixtures em uma única requisição, reduzindo número de chamadas à API
+### Details:
+Criar classe BatchCollector que utiliza o endpoint multi da Sportmonks API para coletar até 100 fixtures por requisição. Implementar lógica de agrupamento de fixtures por liga/temporada para otimizar as chamadas.
+
+## 2. Implementar Cache Redis com TTL Inteligente [pending]
+### Dependencies: None
+### Description: Implementar sistema de cache Redis com TTL diferenciado por tipo de dados para reduzir chamadas desnecessárias à API
+### Details:
+Criar CacheManager com TTL inteligente: fixtures (1h), eventos (30min), escalações (2h), estatísticas (1h). Implementar invalidação automática baseada em updated_at das fixtures.
+
+## 3. Otimizar Rate Limiting Baseado em Headers Reais [pending]
+### Dependencies: None
+### Description: Implementar rate limiting inteligente baseado nos headers de resposta da API Sportmonks para maximizar throughput
+### Details:
+Analisar headers X-RateLimit-* da API Sportmonks e implementar RateLimitManager que ajusta dinamicamente o intervalo entre requisições baseado nos limites reais da API.
+
+## 4. Implementar Retry Policies com Backoff Exponencial [pending]
+### Dependencies: None
+### Description: Implementar sistema de retry inteligente com backoff exponencial e jitter para lidar com falhas temporárias da API
+### Details:
+Criar RetryManager com backoff exponencial (1s, 2s, 4s, 8s, 16s) e jitter aleatório. Implementar circuit breaker para falhas consecutivas. Diferentes políticas para diferentes tipos de erro.
+
+## 5. Testar e Validar Otimizações de Performance [pending]
+### Dependencies: None
+### Description: Executar testes comparativos para validar as otimizações implementadas e medir a melhoria de performance
+### Details:
+Criar script de benchmark que compara performance antes e depois das otimizações. Medir tempo total de coleta, número de requisições, taxa de sucesso e utilização de recursos.
+

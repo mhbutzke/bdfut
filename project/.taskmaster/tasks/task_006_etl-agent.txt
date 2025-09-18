@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Sistema de Monitoramento ETL
+# Status: pending
+# Dependencies: 4
+# Priority: low
+# Description: Implementar monitoramento em tempo real das operações ETL com alertas e métricas
+# Details:
+Criar: dashboard de métricas ETL (registros/hora, taxa de sucesso, qualidade), alertas para falhas críticas, monitoramento de rate limiting, relatórios automáticos de execução, logs estruturados para troubleshooting.
+
+# Test Strategy:
+Verificar se alertas funcionam corretamente e se métricas são coletadas em tempo real.

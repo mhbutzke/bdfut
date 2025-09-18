@@ -652,3 +652,23 @@ class SportmonksClient:
         
         response = self._make_request(f'/stages/{stage_id}', params, 'stage')
         return response.get('data', {}) if response else {}
+    
+    def get_fixtures_multi(self, fixture_ids: str, include: Optional[str] = None) -> Dict:
+        """Obtém múltiplas fixtures usando endpoint multi"""
+        endpoint = f'/fixtures/multi/{fixture_ids}'
+        params = {}
+        if include:
+            params['include'] = include
+        
+        response = self._make_request(endpoint, params, 'fixtures')
+        return response if response else {}
+    
+    def get_fixture_with_includes(self, fixture_id: int, include: Optional[str] = None) -> Dict:
+        """Obtém uma fixture específica com includes"""
+        endpoint = f'/fixtures/{fixture_id}'
+        params = {}
+        if include:
+            params['include'] = include
+        
+        response = self._make_request(endpoint, params, 'fixture')
+        return response if response else {}

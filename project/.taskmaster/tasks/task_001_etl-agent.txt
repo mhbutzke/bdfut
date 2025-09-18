@@ -1,0 +1,31 @@
+# Task ID: 1
+# Title: Organizar Schema das Tabelas para ETL
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Padronizar e organizar estrutura das tabelas do Supabase para otimizar operações ETL, focando em fixtures como tabela central
+# Details:
+Analisar estrutura atual das tabelas principais (fixtures, teams, players, leagues) e identificar colunas faltantes da API Sportmonks. Criar migrations para adicionar campos essenciais que o ETL precisa para funcionar corretamente: name, result_info, placares, metadados ETL.
+
+# Test Strategy:
+Verificar se todas as colunas necessárias para ETL estão presentes e se operações de upsert funcionam corretamente.
+
+# Subtasks:
+## 1. Mapear Colunas Faltantes da API [done]
+### Dependencies: None
+### Description: Identificar quais colunas da API Sportmonks estão faltando nas tabelas do Supabase
+### Details:
+Comparar estrutura de resposta da API (fixtures, teams, players) com schema atual do banco. Documentar colunas faltantes essenciais para ETL: name, result_info, home_score, away_score, leg, last_processed_at.
+
+## 2. Criar Migration para Fixtures [done]
+### Dependencies: 1.1
+### Description: Implementar migration para adicionar colunas essenciais à tabela fixtures
+### Details:
+Executar migration que adiciona: name, result_info, home_score, away_score, leg, details, last_processed_at, campos calculados (total_goals, match_result), metadados ETL (etl_processed_at, etl_version, data_quality_score).
+
+## 3. Otimizar Índices para ETL [done]
+### Dependencies: 1.2
+### Description: Criar índices especializados para operações ETL frequentes
+### Details:
+Implementar índices para: consultas por data (ETL incremental), consultas por liga/temporada (coleta por chunks), consultas por team_id (enriquecimento), flags de dados (has_events, has_lineups, has_statistics).
+

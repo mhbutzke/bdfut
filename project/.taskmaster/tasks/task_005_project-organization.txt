@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Expansão de Testes e Qualidade
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Expandir cobertura de testes, implementar testes de integração e performance
+# Details:
+Implementar: testes de integração para ETL completo, testes de performance para consultas críticas, testes de carga para APIs, validação automática de qualidade de dados, testes de regressão para migrations.
+
+# Test Strategy:
+Atingir cobertura de testes > 90% e garantir que todos os testes passem em CI/CD.
